@@ -5,8 +5,8 @@ import pandas as pd
 import sys
 
 # Check if there are enough command line arguments
-if len(sys.argv) < 6:
-    print("Usage: python scripts/psl_extracts.py var lat1 lat2 lon1 lon2")
+if len(sys.argv) < 7:
+    print("Usage: python scripts/psl_extracts.py var lat1 lat2 lon1 lon2 airshed")
     sys.exit(1)
 
 
@@ -17,13 +17,14 @@ lat1 = str(sys.argv[2])
 lat2 = str(sys.argv[3])
 lon1 = str(sys.argv[4])
 lon2 = str(sys.argv[5])
+airshed = str(sys.argv[6])
 
 
 # lat1 = str(1)
 # lat2 = str(3)
 # lon1 = str(10)
 # lon2 = str(20)
-var = "Air+Temperature"
+#var = "Air+Temperature"
 
 if var in ["Precipitation+Rate", "Air+Temperature"]:
     level = '2000'
@@ -46,7 +47,7 @@ lines = pre_tags_content.strip().split('\n')
 #Open a CSV file for writing
 filename = '{}_{}to{}_{}to{}'.format(var,lat1,lat2,lon1,lon2)
 
-with open(filename+'.csv', 'w', newline='') as csvfile:
+with open(airshed+'_'+var+'.csv', 'w', newline='') as csvfile:
     # Create a CSV writer object
     csvwriter = csv.writer(csvfile)
 
@@ -69,7 +70,7 @@ with open(filename+'.csv', 'w', newline='') as csvfile:
 df = pd.read_csv(filename+'.csv', header=None)
 df.columns = ['year', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-df.to_csv(filename+'.csv', index=False)
+df.to_csv(airshed+'_'+var+'.csv', index=False)
 # Open the file in write mode
 with open(filename+'.txt', "w") as file:
     # Write the text content to the file
