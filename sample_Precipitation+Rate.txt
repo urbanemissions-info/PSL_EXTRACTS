@@ -1,0 +1,4 @@
+Surface Gauss Precipitation Rate (mm/day)
+Latitude Range used:   41.0 to  29.5
+Longitude Range used:  50.6 to  60.0
+Data has been multiplied by    86400.0000

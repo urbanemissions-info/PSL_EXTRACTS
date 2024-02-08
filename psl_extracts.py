@@ -6,7 +6,7 @@ import sys
 
 # Check if there are enough command line arguments
 if len(sys.argv) < 7:
-    print("Usage: python scripts/psl_extracts.py var lat1 lat2 lon1 lon2 airshed")
+    print("Usage: python psl_extracts.py var lat1 lat2 lon1 lon2 airshed")
     sys.exit(1)
 
 
@@ -45,8 +45,6 @@ pre_tags_content = soup.find_all('pre')[0].text
 lines = pre_tags_content.strip().split('\n')
 
 #Open a CSV file for writing
-filename = '{}_{}to{}_{}to{}'.format(var,lat1,lat2,lon1,lon2)
-
 with open(airshed+'_'+var+'.csv', 'w', newline='') as csvfile:
     # Create a CSV writer object
     csvwriter = csv.writer(csvfile)
@@ -67,12 +65,12 @@ with open(airshed+'_'+var+'.csv', 'w', newline='') as csvfile:
 
 
 
-df = pd.read_csv(filename+'.csv', header=None)
+df = pd.read_csv(airshed+'_'+var+'.csv', header=None)
 df.columns = ['year', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 df.to_csv(airshed+'_'+var+'.csv', index=False)
 # Open the file in write mode
-with open(filename+'.txt', "w") as file:
+with open(airshed+'_'+var+'.txt', "w") as file:
     # Write the text content to the file
     file.write('\n'.join(lines[79:]))
 
