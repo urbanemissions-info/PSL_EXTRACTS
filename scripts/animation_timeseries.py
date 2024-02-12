@@ -31,7 +31,7 @@ data = data[years]
 # }
 
 # Create a figure and axis
-fig, ax = plt.subplots()
+fig, ax = plt.subplots() #figsize=(16, 8)
 ax.set_xlim(0, 11)  # 12 months
 ax.set_ylim(280, 320)   # Assuming data is between 0 and 1
 
@@ -101,8 +101,8 @@ plt.yticks(fontweight='bold')
 plt.ylabel('Kelvin (K)', fontweight='bold')
 plt.title('ERA5 2m Air Temperature', fontweight='bold')
 # Load the image
-logo = plt.imread(os.getcwd() + '/assets/logo.grid.3_transp.jpg')  # Provide the path to your image file
-plt.figimage(logo, xo=525, yo=0.02)
+logo = plt.imread(os.getcwd() + '/assets/UEinfo_logo3_resized.jpg')  # Provide the path to your image file
+plt.figimage(logo, xo=590, yo=0.02)
 
 # saving to m4 using ffmpeg writer 
 ani.save('plots/ERA5_animation.gif') 
