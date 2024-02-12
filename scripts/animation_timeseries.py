@@ -4,19 +4,13 @@ from matplotlib.animation import FuncAnimation
 import os
 import pandas as pd
 
-def generate_color_list(length):
-    # Generate a list of unique colors
-    colors = plt.cm.tab10.colors  # You can use any colormap you prefer
-    num_colors = len(colors)
-    
-    # Repeat colors if necessary to match the desired length
-    repetitions = length // num_colors + 1
-    color_list = colors * repetitions
-    
-    # Trim the list to the desired length
-    color_list = color_list[:length]
-    
-    return list(color_list)
+def generate_color_list(length, cmap_name='coolwarm'):
+    # Generate a list of unique colors using the specified colormap
+    cmap = plt.get_cmap(cmap_name)
+    num_colors = cmap.N
+    color_indices = np.linspace(0, num_colors, length)
+    colors = [cmap(round(index)) for index in color_indices]
+    return list(colors)
 
 #Data
 df = pd.read_csv(os.getcwd() + '/data/era5/sample_2m+Air+Temperature.csv')
@@ -43,13 +37,13 @@ ax.set_ylim(280, 320)   # Assuming data is between 0 and 1
 
 # Create an empty line object for each year
 lines = {}
-colors = ['blue', 'red','green']  # You can add more colors as needed
+#colors = ['blue', 'red','green']  # You can add more colors as needed
 colors = generate_color_list(len(years))
 for year in years:
     lines[year], = ax.plot([], [], lw=2, color=colors.pop(0))
 
 # Initialize title text
-title = ax.text(0.5, .95, 'Hahah', ha='center', va='center', transform=ax.transAxes)
+title = ax.text(0.90, .95, 'Hahah', ha='center', va='center', transform=ax.transAxes, weight='bold',size=14)
 annotation = ax.annotate(
     '.',
     xy=(1,0.5),
@@ -79,7 +73,7 @@ def animate(i):
         line.set_data(x_data[yr], y_data[yr])
 
     # Update title
-    title.set_text('Year: {} Month: {}'.format(year, i % 12 + 1))
+    title.set_text('{}/{}'.format(i % 12 + 1, year,))
 
     annotation.set_position((i%12 - 0.1,
                              data[year][i%12]))
@@ -93,14 +87,23 @@ ani = FuncAnimation(fig,
                     func = animate,
                     frames= len(years)*12,
                     init_func=init,
-                    interval=300,
+                    interval=40,
                     blit=True,
-                    repeat=False,
+                    repeat=True,
                     save_count=len(years)*12)
 
-plt.xlabel('Month')
-plt.ylabel('Temperature')
-plt.title('ERA5 Temperatures')
+plt.xticks(range(0,12),
+           ['J', 'F', 'M', 'A', 'M', 'J' ,'J', 'A', 'S', 'O', 'N', 'D'],
+           fontweight='bold')
+plt.xlabel('Month', fontweight='bold')
+
+plt.yticks(fontweight='bold')
+plt.ylabel('Kelvin (K)', fontweight='bold')
+plt.title('ERA5 2m Air Temperature', fontweight='bold')
+# Load the image
+logo = plt.imread(os.getcwd() + '/assets/logo.grid.3_transp.jpg')  # Provide the path to your image file
+plt.figimage(logo, xo=525, yo=0.02)
+
 # saving to m4 using ffmpeg writer 
 ani.save('plots/ERA5_animation.gif') 
 plt.close() 
