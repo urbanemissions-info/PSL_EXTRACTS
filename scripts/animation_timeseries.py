@@ -3,6 +3,17 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import os
 import pandas as pd
+import sys
+# Check if there are enough command line arguments
+if len(sys.argv) < 4:
+    print("Usage: python animation_timeseries.py reanalysis var airshed")
+    sys.exit(1)
+
+# USER INPUTS
+reanalysis = sys.argv[1].lower()
+var = str(sys.argv[2]).lower()
+airshed = str(sys.argv[3]).lower()
+
 
 def generate_color_list(length, cmap_name='coolwarm'):
     # Generate a list of unique colors using the specified colormap
@@ -13,16 +24,27 @@ def generate_color_list(length, cmap_name='coolwarm'):
     return list(colors)
 
 #Data
-df = pd.read_csv(os.getcwd() + '/data/era5/sample_2m+Air+Temperature.csv')
-df['Date'] = pd.to_datetime(df.Date)
-df['year'] = df['Date'].dt.year
-df['month'] = df['Date'].dt.month - 1
-years = df.year.unique()
-data = df.pivot(index='month', columns='year', values=' ERA5 2m Air Temperature (K) 10N-20N;30E-40E')
+if reanalysis == 'era5':
+    data = pd.read_csv(os.getcwd() + '/data/tabulated_reanalysis_fields/tabulated_era5/era5_{}_monthavg_{}.csv'.format(var, airshed)).T
+    new_header = data.iloc[0]
+
+    data = data[1:]
+    data.columns = new_header
+    data.reset_index(drop=True, inplace=True)
+
+    data_source_annotation = '''Source: PSL/NCAR'''
+else:
+    df = pd.read_csv(os.getcwd() + '/data/era5/sample_2m+Air+Temperature.csv')
+    df['Date'] = pd.to_datetime(df.Date)
+    df['year'] = df['Date'].dt.year
+    df['month'] = df['Date'].dt.month - 1
+    years = df.year.unique()
+    data = df.pivot(index='month', columns='year', values=' ERA5 2m Air Temperature (K) 10N-20N;30E-40E')
 
 years = range(1980,2024)
 data = data[years]
-
+min_val = data.min().min()
+max_val  = data.max().max()
 #ERA5 2m Air Temperature (K) 10N-20N;30E-40E
 # Generate some sample data for two years
 # data = {
@@ -33,7 +55,11 @@ data = data[years]
 # Create a figure and axis
 fig, ax = plt.subplots() #figsize=(16, 8)
 ax.set_xlim(0, 11)  # 12 months
-ax.set_ylim(280, 320)   # Assuming data is between 0 and 1
+
+if var == 'temp2m':
+    data = data - 273.15
+    ax.set_ylim(min_val-273.15-5, max_val-273.15+5)   # Assuming data is between 0 and 1
+
 
 # Create an empty line object for each year
 lines = {}
@@ -98,12 +124,16 @@ plt.xticks(range(0,12),
 plt.xlabel('Month', fontweight='bold')
 
 plt.yticks(fontweight='bold')
-plt.ylabel('Kelvin (K)', fontweight='bold')
-plt.title('ERA5 2m Air Temperature', fontweight='bold')
+plt.ylabel('Celsius (C)', fontweight='bold')
+plt.title('ERA5 Reanalysis 2m-temperature (C) - {}'.format(airshed.capitalize()), fontweight='bold')
+
+# Add data source annotation
+plt.text(0.01, 0.02, data_source_annotation, fontsize=8, color='gray', transform=plt.gcf().transFigure)
+
 # Load the image
 logo = plt.imread(os.getcwd() + '/assets/UEinfo_logo3_resized.jpg')  # Provide the path to your image file
 plt.figimage(logo, xo=590, yo=0.02)
 
 # saving to m4 using ffmpeg writer 
-ani.save('plots/ERA5_animation.gif') 
+ani.save('plots/{}_animations/ERA5_{}_{}_anime.gif'.format(reanalysis,var,airshed)) 
 plt.close() 

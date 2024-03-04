@@ -37,3 +37,28 @@ python scripts/psl_extracts.py Precipitation+Rate 30 40 60 90
 Outputs are saved in the `data/ncep` folder.
 1. Csv -- data from 1948 to 2024
 2. Txt file -- metadata
+
+---
+# Animations
+
+To get the timeseries animations, run in project root
+
+```bash
+python scripts/animation_timeseries.py reanalysis var airshed
+```
+Examples:
+```bash
+python scripts/animation_timeseries.py era5 temp2m agra
+```
+Use `run_animation_timeseries.sh` to run this code for all cities.
+
+---
+
+# Regplots
+```bash
+python scripts/regplots.py reanalysis var airshed
+```
+Examples:
+```bash
+python scripts/regplots.py era5 temp2m agra
+```
