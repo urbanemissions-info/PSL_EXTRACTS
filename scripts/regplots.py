@@ -17,22 +17,23 @@ var = str(sys.argv[2]).lower()
 airshed = str(sys.argv[3]).lower()
 
 #Data
-if reanalysis == 'era5':
-    data = pd.read_csv(os.getcwd() + '/data/tabulated_reanalysis_fields/tabulated_era5/era5_{}_monthavg_{}.csv'.format(var, airshed)).T
-    new_header = data.iloc[0]
+#if reanalysis  'era5':
+data = pd.read_csv(os.getcwd() + '/data/tabulated_reanalysis_fields/tabulated_{}/{}_{}_monthavg_{}.csv'.format(reanalysis, reanalysis,
+                                                                                                                var, airshed)).T
+new_header = data.iloc[0]
 
-    data = data[1:]
-    data.columns = new_header
-    data.reset_index(drop=True, inplace=True)
+data = data[1:]
+data.columns = new_header
+data.reset_index(drop=True, inplace=True)
 
-    data_source_annotation = '''Source: PSL/NCAR'''
-else:
-    df = pd.read_csv(os.getcwd() + '/data/era5/sample_2m+Air+Temperature.csv')
-    df['Date'] = pd.to_datetime(df.Date)
-    df['year'] = df['Date'].dt.year
-    df['month'] = df['Date'].dt.month - 1
-    years = df.year.unique()
-    data = df.pivot(index='month', columns='year', values=' ERA5 2m Air Temperature (K) 10N-20N;30E-40E')
+data_source_annotation = '''Source: PSL/NCAR'''
+# else:
+#     df = pd.read_csv(os.getcwd() + '/data/era5/sample_2m+Air+Temperature.csv')
+#     df['Date'] = pd.to_datetime(df.Date)
+#     df['year'] = df['Date'].dt.year
+#     df['month'] = df['Date'].dt.month - 1
+#     years = df.year.unique()
+#     data = df.pivot(index='month', columns='year', values=' {} 2m Air Temperature (K) 10N-20N;30E-40E'.format(reanalysis.upper()))
 
 if var == 'temp2m':
     data = data - 273.15
@@ -48,12 +49,12 @@ for i in range(0,12):
     sns.regplot(data=df_month, x="year", y="Temperature (°C)", ax=axes[i], color='green')
 
     #DUMMY MAX
-    df_month['Temperature (°C)'] = df_month['Temperature (°C)'] + 3
-    sns.regplot(data=df_month, x="year", y="Temperature (°C)", ax=axes[i], color='red')
+    #df_month['Temperature (°C)'] = df_month['Temperature (°C)'] + 3
+    #sns.regplot(data=df_month, x="year", y="Temperature (°C)", ax=axes[i], color='red')
 
     #DUMMY MIN
-    df_month['Temperature (°C)'] = df_month['Temperature (°C)'] - 6
-    sns.regplot(data=df_month, x="year", y="Temperature (°C)", ax=axes[i], color='blue')
+    #df_month['Temperature (°C)'] = df_month['Temperature (°C)'] - 6
+    #sns.regplot(data=df_month, x="year", y="Temperature (°C)", ax=axes[i], color='blue')
 
     axes[i].set_title("{}".format(months[i]), fontweight='bold')
     axes[i].xaxis.set_major_locator(MultipleLocator(20))
@@ -61,8 +62,14 @@ for i in range(0,12):
     #axes[0].set_ylabel('Temperature (°C)', fontweight='bold')
     if i != 0:
         axes[i].set_ylabel('')
-    
-plt.suptitle('ERA5 Reanalysis 2m-temperature (°C) - {}'.format(airshed.capitalize()), fontweight='bold')
+
+if reanalysis == 'ncepdoer2':
+    title = 'NCEP-DOE'
+elif reanalysis == 'ncepncarr1':
+    title = 'NCEP-NCAR'
+else:
+    title = reanalysis.upper()    
+plt.suptitle('{} Reanalysis 2m-temperature (°C) - {}'.format(title, airshed.capitalize()), fontweight='bold')
 
 # Add data source annotation
 plt.text(0.01, 0.02, data_source_annotation, fontsize=8, color='gray', transform=plt.gcf().transFigure)
@@ -71,4 +78,4 @@ plt.text(0.01, 0.02, data_source_annotation, fontsize=8, color='gray', transform
 logo = plt.imread(os.getcwd() + '/assets/UEinfo_logo3_resized.jpg')  # Provide the path to your image file
 plt.figimage(logo, xo=1800, yo=0.02)
 
-plt.savefig(os.getcwd()+ '/plots/{}_regplots/ERA5_{}_{}_regplot.png'.format(reanalysis,var,airshed))
+plt.savefig(os.getcwd()+ '/plots/{}_regplots/{}_{}_{}_regplot.png'.format(reanalysis,reanalysis.upper(),var,airshed))
